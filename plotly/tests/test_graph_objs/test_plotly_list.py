@@ -7,7 +7,7 @@ A module intended for use with Nose.
 """
 from nose.tools import raises
 from ... graph_objs.graph_objs import PlotlyList, PlotlyDict
-from ... exceptions import PlotlyError
+from ... plotly_exceptions import PlotlyError
 
 
 def test_trivial():

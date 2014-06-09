@@ -24,7 +24,7 @@ import base64
 import os
 from .. import utils  # TODO make non-relative
 from .. import tools
-from .. import exceptions
+from .. import plotly_exceptions
 from .. import version
 
 __all__ = ["sign_in", "update_plot_options", "get_plot_options",
@@ -146,14 +146,14 @@ def plot(figure_or_data, validate=True, **plot_options):
     elif isinstance(figure_or_data, list):
         figure = {'data': figure_or_data}
     else:
-        raise exceptions.PlotlyError("The `figure_or_data` positional argument "
+        raise plotly_exceptions.PlotlyError("The `figure_or_data` positional argument "
                                      "must be either `dict`-like or "
                                      "`list`-like.")
     if validate:
         try:
             tools.validate(figure, obj_type='Figure')
-        except exceptions.PlotlyError as err:
-            raise exceptions.PlotlyError("Invalid 'figure_or_data' argument. "
+        except plotly_exceptions.PlotlyError as err:
+            raise plotly_exceptions.PlotlyError("Invalid 'figure_or_data' argument. "
                                          "Plotly will not be able to properly "
                                          "parse the resulting JSON. If you "
                                          "want to send this 'figure_or_data' "
@@ -192,7 +192,7 @@ def plot(figure_or_data, validate=True, **plot_options):
                 pass
         return res['url']
     else:
-        raise exceptions.PlotlyAccountError(res['error'])
+        raise plotly_exceptions.PlotlyAccountError(res['error'])
 
 
 def iplot_mpl(fig, resize=True, strip_style=False, **plot_options):
@@ -274,7 +274,7 @@ def get_figure(file_owner, file_id, raw=False):
     try:
         test_if_int = int(file_id)
     except ValueError:
-        raise exceptions.PlotlyError(
+        raise plotly_exceptions.PlotlyError(
             "The 'file_id' argument was not able to be converted into an "
             "integer number. Make sure that the positional 'file_id' argument "
             "is a number that can be converted into an integer or a string "
@@ -282,7 +282,7 @@ def get_figure(file_owner, file_id, raw=False):
         )
 
     if int(file_id) < 0:
-        raise exceptions.PlotlyError(
+        raise plotly_exceptions.PlotlyError(
             "The 'file_id' argument must be a non-negative number."
         )
 
@@ -299,9 +299,9 @@ def get_figure(file_owner, file_id, raw=False):
     else:
         try:
             content = json.loads(response.content)
-            raise exceptions.PlotlyError(content)
+            raise plotly_exceptions.PlotlyError(content)
         except:
-            raise exceptions.PlotlyError(
+            raise plotly_exceptions.PlotlyError(
                 "There was an error retrieving this file")
 
 
@@ -390,8 +390,8 @@ class Stream:
         if validate:
             try:
                 tools.validate(stream_object, stream_object['type'])
-            except exceptions.PlotlyError as err:
-                raise exceptions.PlotlyError(
+            except plotly_exceptions.PlotlyError as err:
+                raise plotly_exceptions.PlotlyError(
                     "Part of the data object with type, '{}', is invalid. This "
                     "will default to 'scatter' if you do not supply a 'type'. "
                     "If you do not want to validate your data objects when "
@@ -401,8 +401,8 @@ class Stream:
                 )
             try:
                 tools.validate_stream(stream_object, stream_object['type'])
-            except exceptions.PlotlyError as err:
-                raise exceptions.PlotlyError(
+            except plotly_exceptions.PlotlyError as err:
+                raise plotly_exceptions.PlotlyError(
                     "Part of the data object with type, '{}', cannot yet be "
                     "streamed into Plotly. If you do not want to validate your "
                     "data objects when streaming, you can set 'validate=False' "
@@ -413,8 +413,8 @@ class Stream:
             if layout is not None:
                 try:
                     tools.validate(layout, 'Layout')
-                except exceptions.PlotlyError as err:
-                    raise exceptions.PlotlyError(
+                except plotly_exceptions.PlotlyError as err:
+                    raise plotly_exceptions.PlotlyError(
                         "Your layout kwarg was invalid. "
                         "Here's why:\n\n{}".format(err)
                     )
@@ -430,7 +430,7 @@ class Stream:
         try:
             self._stream.write(jdata, reconnect_on=reconnect_on)
         except AttributeError:
-            raise exceptions.PlotlyError("Stream has not been opened yet, "
+            raise plotly_exceptions.PlotlyError("Stream has not been opened yet, "
                                          "cannot write to a closed connection. "
                                          "Call `open()` on the stream to open the stream.")
 
@@ -444,7 +444,7 @@ class Stream:
         try:
             self._stream.close()
         except AttributeError:
-            raise exceptions.PlotlyError("Stream has not been opened yet.")
+            raise plotly_exceptions.PlotlyError("Stream has not been opened yet.")
 
 
 class image:
@@ -474,10 +474,10 @@ class image:
             try:
                 return_data = json.loads(res.content)
             except:
-                raise exceptions.PlotlyError("The response "
+                raise plotly_exceptions.PlotlyError("The response "
                                              "from plotly could "
                                              "not be translated.")
-            raise exceptions.PlotlyError(return_data['error'])
+            raise plotly_exceptions.PlotlyError(return_data['error'])
 
     @classmethod
     def ishow(cls, figure):
@@ -516,7 +516,7 @@ def _send_to_plotly(figure, **plot_options):
         (username, api_key) = (file_credentials['username'],
                                file_credentials['api_key'])
     else:
-        raise exceptions.PlotlyLocalCredentialsError()
+        raise plotly_exceptions.PlotlyLocalCredentialsError()
 
     kwargs = json.dumps(dict(filename=plot_options['filename'],
                              fileopt=plot_options['fileopt'],
@@ -564,5 +564,5 @@ def _validation_key_logic():
     else:
         api_key = None
     if username is None or api_key is None:
-        raise exceptions.PlotlyLocalCredentialsError()
+        raise plotly_exceptions.PlotlyLocalCredentialsError()
     return (username, api_key)

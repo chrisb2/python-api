@@ -7,7 +7,7 @@ A module intended for use with Nose.
 """
 from ... graph_objs import graph_objs
 from ... plotly import plotly as py
-from ... import exceptions
+from ... import plotly_exceptions
 
 
 # username for tests: 'plotlyimagetest'
@@ -123,7 +123,7 @@ def test_all():
                 fig_raw = py.get_figure('plotlyimagetest',
                                         str(file_id),
                                         raw=True)
-            except exceptions.PlotlyError:
+            except plotly_exceptions.PlotlyError:
                 pass
             if (fig is None) and (fig_raw is None):
                 print "    couldn't find: https://plot.ly/{}/{}".format(un,
@@ -133,7 +133,7 @@ def test_all():
             file_id += 1
             if file_id > end_file:
                 break
-        raise exceptions.PlotlyError("This error was generated so that the "
+        raise plotly_exceptions.PlotlyError("This error was generated so that the "
                                      "following output is produced...")
 
 

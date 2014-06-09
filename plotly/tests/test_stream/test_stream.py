@@ -9,7 +9,7 @@ import time
 from nose.tools import raises
 from ... graph_objs import *
 from ... plotly import plotly as py
-from ... import exceptions
+from ... import plotly_exceptions
 
 un = 'pythonapi'
 ak = 'ubpiol2cve'
@@ -92,7 +92,7 @@ def test_stream_layout():
         assert fig['layout']['title'] == title_1
 
 
-@raises(exceptions.PlotlyError)
+@raises(plotly_exceptions.PlotlyError)
 def test_stream_validate_data():
     if run_tests:
         my_stream = py.Stream(tk)
@@ -101,10 +101,10 @@ def test_stream_validate_data():
         time.sleep(1)
         my_stream.close()
     else:
-        raise exceptions.PlotlyError()
+        raise plotly_exceptions.PlotlyError()
 
 
-@raises(exceptions.PlotlyError)
+@raises(plotly_exceptions.PlotlyError)
 def test_stream_validate_layout():
     if run_tests:
         my_stream = py.Stream(tk)
@@ -113,4 +113,4 @@ def test_stream_validate_layout():
         time.sleep(1)
         my_stream.close()
     else:
-        raise exceptions.PlotlyError()
+        raise plotly_exceptions.PlotlyError()

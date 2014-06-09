@@ -12,7 +12,7 @@ import os.path
 import warnings
 from . graph_objs import graph_objs
 from . import utils
-from . import exceptions
+from . import plotly_exceptions
 
 try:
     from . import matplotlylib
@@ -83,7 +83,7 @@ def set_credentials_file(username=None, api_key=None, stream_ids=None):
 
     """
     if not _file_permissions:
-        raise exceptions.PlotlyError("You don't have proper file permissions "
+        raise plotly_exceptions.PlotlyError("You don't have proper file permissions "
                                      "to run this function.")
     ensure_local_plotly_files()  # make sure what's there is OK
     credentials = get_credentials_file()
@@ -143,7 +143,7 @@ def set_config_file(plotly_domain=None, plotly_stremaing_domain=None):
 
     """
     if not _file_permissions:
-        raise exceptions.PlotlyError("You don't have proper file permissions "
+        raise plotly_exceptions.PlotlyError("You don't have proper file permissions "
                                      "to run this function.")
     ensure_local_plotly_files()  # make sure what's there is OK
     settings = get_config_file()
@@ -374,7 +374,7 @@ def get_valid_graph_obj(obj, obj_type=None):
         try:
             new_obj = graph_objs.NAME_TO_CLASS[obj_type]()
         except KeyError:
-            raise exceptions.PlotlyError(
+            raise plotly_exceptions.PlotlyError(
                 "'{}' nor '{}' are recognizable graph_objs.".
                 format(obj.__class__.__name__, obj_type))
     if isinstance(new_obj, list):
@@ -401,7 +401,7 @@ def validate(obj, obj_type):
     try:
         test_obj = graph_objs.NAME_TO_CLASS[obj_type](obj)
     except KeyError:
-        raise exceptions.PlotlyError(
+        raise plotly_exceptions.PlotlyError(
             "'{}' is not a recognizable graph_obj.".
             format(obj_type))
 
@@ -422,13 +422,13 @@ def validate_stream(obj, obj_type):
             continue
         if 'streamable' in info[key]:
             if not info[key]['streamable']:
-                raise exceptions.PlotlyError(
+                raise plotly_exceptions.PlotlyError(
                     "The '{}' key is not streamable in the '{}' object".format(
                         key, obj_type
                     )
                 )
         else:
-            raise exceptions.PlotlyError(
+            raise plotly_exceptions.PlotlyError(
                 "The '{}' key is not streamable in the '{}' object".format(
                     key, obj_type
                 )

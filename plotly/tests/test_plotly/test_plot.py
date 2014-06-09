@@ -7,7 +7,7 @@ A module intended for use with Nose.
 """
 from ... graph_objs import graph_objs
 from ... plotly import plotly as py
-from ... import exceptions
+from ... import plotly_exceptions
 
 
 # username for tests: 'plotlyimagetest'

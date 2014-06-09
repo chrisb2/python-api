@@ -26,7 +26,7 @@ import warnings
 import collections
 import json
 import textwrap
-from .. import exceptions
+from .. import plotly_exceptions
 from .. import utils
 
 __all__ = ["Data",
@@ -306,12 +306,12 @@ class PlotlyList(list):
             if isinstance(entry, PlotlyDict):
                 try:
                     entry.to_graph_objs(caller=False)
-                except (exceptions.PlotlyGraphObjectError) as err:
+                except (plotly_exceptions.PlotlyGraphObjectError) as err:
                     err.add_to_error_path(index)
                     err.prepare()
                     raise  # re-raise current exception
             else:
-                raise exceptions.PlotlyListEntryError(obj=self,
+                raise plotly_exceptions.PlotlyListEntryError(obj=self,
                                                       index=index,
                                                       entry=entry)
 
@@ -382,19 +382,19 @@ class PlotlyList(list):
         if caller:  # change everything to PlotlyList/Dict objects
             try:
                 self.to_graph_objs()
-            except exceptions.PlotlyGraphObjectError as err:
+            except plotly_exceptions.PlotlyGraphObjectError as err:
                 err.prepare()
                 raise
         for index, entry in enumerate(self):
             if isinstance(entry, PlotlyDict):
                 try:
                     entry.validate(caller=False)
-                except exceptions.PlotlyGraphObjectError as err:
+                except plotly_exceptions.PlotlyGraphObjectError as err:
                     err.add_to_error_path(index)
                     err.prepare()
                     raise
             else:
-                raise exceptions.PlotlyGraphObjectError(  # TODO!!!
+                raise plotly_exceptions.PlotlyGraphObjectError(  # TODO!!!
                     message="uh-oh, this error shouldn't have happenend.",
                     plain_message="uh-oh, this error shouldn't have happenend.",
                     path=[index],
@@ -439,7 +439,7 @@ class PlotlyList(list):
         if caller:
             try:
                 self.to_graph_objs(caller=False)
-            except exceptions.PlotlyGraphObjectError as err:
+            except plotly_exceptions.PlotlyGraphObjectError as err:
                 err.add_note("Could not order list because it could not be "
                              "converted to a valid graph object.")
                 err.prepare()
@@ -624,7 +624,7 @@ class PlotlyDict(dict):
             if isinstance(self[key], (PlotlyDict, PlotlyList)):
                 try:
                     self[key].to_graph_objs(caller=False)
-                except exceptions.PlotlyGraphObjectError as err:
+                except plotly_exceptions.PlotlyGraphObjectError as err:
                     err.add_to_error_path(key)
                     err.prepare()
                     raise
@@ -635,7 +635,7 @@ class PlotlyDict(dict):
                     if isinstance(obj, PlotlyDict):
                         if not isinstance(self[key], dict):
                             info_key = NAME_TO_KEY[self.__class__.__name__]
-                            raise exceptions.PlotlyDictValueError(
+                            raise plotly_exceptions.PlotlyDictValueError(
                                 obj=self,
                                 key=key,
                                 value=self[key],
@@ -647,7 +647,7 @@ class PlotlyDict(dict):
                     else:  # if not PlotlyDict, it MUST be a PlotlyList
                         if not isinstance(self[key], list):
                             info_key = NAME_TO_KEY[self.__class__.__name__]
-                            raise exceptions.PlotlyDictValueError(  # TODO!!!
+                            raise plotly_exceptions.PlotlyDictValueError(  # TODO!!!
                                 obj=self,
                                 key=key,
                                 value=self[key],
@@ -657,7 +657,7 @@ class PlotlyDict(dict):
                         obj += self.pop(key)
                     try:
                         obj.to_graph_objs(caller=False)
-                    except exceptions.PlotlyGraphObjectError as err:
+                    except plotly_exceptions.PlotlyGraphObjectError as err:
                         err.add_to_error_path(key)
                         err.prepare()
                         raise
@@ -678,7 +678,7 @@ class PlotlyDict(dict):
         if caller:  # change everything to 'checkable' objs
             try:
                 self.to_graph_objs(caller=False)
-            except exceptions.PlotlyGraphObjectError as err:
+            except plotly_exceptions.PlotlyGraphObjectError as err:
                 err.prepare()
                 raise
         obj_key = NAME_TO_KEY[self.__class__.__name__]
@@ -686,7 +686,7 @@ class PlotlyDict(dict):
             if isinstance(val, (PlotlyDict, PlotlyList)):
                 try:
                     val.validate(caller=False)
-                except exceptions.PlotlyGraphObjectError as err:
+                except plotly_exceptions.PlotlyGraphObjectError as err:
                     err.add_to_error_path(key)
                     err.prepare()
                     raise
@@ -695,7 +695,7 @@ class PlotlyDict(dict):
                     if 'type' not in INFO[obj_key][key]:
                         continue  # TODO: 'type' may not be documented yet!
                     if INFO[obj_key][key]['type'] == 'object':
-                        raise exceptions.PlotlyDictValueError(
+                        raise plotly_exceptions.PlotlyDictValueError(
                             obj=self,
                             key=key,
                             value=val,
@@ -717,7 +717,7 @@ class PlotlyDict(dict):
                     else:
                         notes += ("Couldn't find uses for key: {}\n\n"
                                   "".format(repr(key)))
-                    raise exceptions.PlotlyDictKeyError(obj=self,
+                    raise plotly_exceptions.PlotlyDictKeyError(obj=self,
                                                         key=key,
                                                         notes=notes)
 
@@ -773,7 +773,7 @@ class PlotlyDict(dict):
         if caller:  # change everything to 'order-able' objs
             try:
                 self.to_graph_objs(caller=False)
-            except exceptions.PlotlyGraphObjectError as err:
+            except plotly_exceptions.PlotlyGraphObjectError as err:
                 err.add_note("dictionary could not be ordered because it "
                              "could not be converted to a valid plotly graph "
                              "object.")
@@ -854,7 +854,7 @@ class Data(PlotlyList):
                 try:
                     obj_name = KEY_TO_NAME[entry['type']]
                 except KeyError:
-                    raise exceptions.PlotlyDataTypeError(
+                    raise plotly_exceptions.PlotlyDataTypeError(
                         obj=self,
                         index=index
                     )
@@ -863,7 +863,7 @@ class Data(PlotlyList):
                     obj[k] = v
                 self[index] = obj
             if not isinstance(self[index], PlotlyTrace):  # Trace ONLY!!!
-                raise exceptions.PlotlyListEntryError(
+                raise plotly_exceptions.PlotlyListEntryError(
                     obj=self,
                     index=index,
                     notes="The entry could not be converted into a PlotlyTrace "
@@ -900,7 +900,7 @@ class Annotations(PlotlyList):
         for index, entry in enumerate(self):
             if isinstance(entry, (PlotlyDict, PlotlyList)):
                 if not isinstance(entry, Annotation):
-                    raise exceptions.PlotlyListEntryError(
+                    raise plotly_exceptions.PlotlyListEntryError(
                         obj=self,
                         index=index,
                         notes="The entry could not be converted into an "
@@ -913,7 +913,7 @@ class Annotations(PlotlyList):
                     obj[k] = v
                 self[index] = obj
             else:
-                raise exceptions.PlotlyListEntryError(
+                raise plotly_exceptions.PlotlyListEntryError(
                     obj=self,
                     index=index,
                     notes="The entry could not be converted into an Annotation "
