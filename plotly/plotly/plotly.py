@@ -405,6 +405,14 @@ class Stream:
                                                80,
                                                {'Host': streaming_url,
                                                 'plotly-streamtoken': self.stream_id})
+												
+    def heartbeat(self, reconnect_on=(200, '', 408)):
+        try:
+            self._stream.write("\n", reconnect_on=reconnect_on)
+        except AttributeError:
+            raise exceptions.PlotlyError("Stream has not been opened yet, "
+                                         "cannot write to a closed connection. "
+                                         "Call `open()` on the stream to open the stream.")
 
     def write(self, data, layout=None, validate=True,
               reconnect_on=(200, '', 408)):
