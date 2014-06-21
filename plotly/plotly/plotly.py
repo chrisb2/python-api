@@ -405,11 +405,11 @@ class Stream:
                                                80,
                                                {'Host': streaming_url,
                                                 'plotly-streamtoken': self.stream_id})
-												
+
     def heartbeat(self, reconnect_on=(200, '', 408)):
-		""" Write a heartbeat to keep the connection alive if there is no data to 
-		stream within the 60 second window.
-		"""
+        """ Write a heartbeat to keep the connection alive if there is no data to 
+        stream within the 60 second window.
+        """
         try:
             self._stream.write("\n", reconnect_on=reconnect_on)
         except AttributeError:
