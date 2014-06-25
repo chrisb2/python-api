@@ -411,7 +411,7 @@ class Stream:
         stream within the 60 second window.
         """
         try:
-            self._stream.write("\n", reconnect_on=reconnect_on)
+            self._stream.heartbeat(reconnect_on=reconnect_on)
         except AttributeError:
             raise exceptions.PlotlyError("Stream has not been opened yet, "
                                          "cannot write to a closed connection. "
