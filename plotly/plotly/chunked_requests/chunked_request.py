@@ -18,43 +18,11 @@ class Stream:
         self._connect()
 
     def write(self, data, reconnect_on=('', 200, )):
-        ''' Send `data` to the server in chunk-encoded form.
-        Check the connection before writing and reconnect
-        if disconnected and if the response status code is in `reconnect_on`.
-
-        The response may either be an HTTPResponse object or an empty string.
+        ''' Send `data` to the server in chunk-encoded form, verifying
+        the connection is still open before doing so.
         '''
-
-        if not self._isconnected():
-
-            # Attempt to get the response.
-            response = self._getresponse()
-
-            # Reconnect depending on the status code.
-            if ((response == '' and '' in reconnect_on) or
-                (response and isinstance(response, httplib.HTTPResponse) and
-                 response.status in reconnect_on)):
-                self._reconnect()
-
-            elif response and isinstance(response, httplib.HTTPResponse):
-                # If an HTTPResponse was recieved then
-                # make the users aware instead of
-                # auto-reconnecting in case the
-                # server is responding with an important
-                # message that might prevent
-                # future requests from going through,
-                # like Invalid Credentials.
-                # This allows the user to determine when
-                # to reconnect.
-                raise Exception("Server responded with "
-                                "status code: {status_code}\n"
-                                "and message: {msg}."
-                                .format(status_code=response.status,
-                                        msg=response.read()))
-
-            elif response == '':
-                raise Exception("Attempted to write but socket "
-                                "was not connected.")
+        
+        _verifyConnection(reconnect_on)
 
         try:
             msg = data
@@ -67,9 +35,22 @@ class Stream:
             self.write(data)
 
     def heartbeat(self, reconnect_on=('', 200, )):   
-        ''' Send `\n` to the server
-        Check the connection before writing and reconnect
-        if disconnected and if the response status code is in `reconnect_on`.
+        ''' Send `\n` to the server, verifying the connection is still 
+        open before doing so.
+        '''
+
+        _verifyConnection(reconnect_on)
+
+        try:
+            # Send the \n
+            self._conn.send('\n')
+        except httplib.socket.error:
+            self._reconnect()
+            self.heartbeat()
+
+    def _verifyConnection(self, reconnect_on):
+        ''' Check the connection, reconnect if disconnected and if the 
+        response status code is in `reconnect_on`.
 
         The response may either be an HTTPResponse object or an empty string.
         '''
@@ -104,13 +85,6 @@ class Stream:
             elif response == '':
                 raise Exception("Attempted to write but socket "
                                 "was not connected.")
-
-        try:
-            # Send the \n
-            self._conn.send('\n')
-        except httplib.socket.error:
-            self._reconnect()
-            self.heartbeat()
 
     def _connect(self):
         ''' Initialize an HTTP connection with chunked Transfer-Encoding
