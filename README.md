@@ -3,7 +3,7 @@ Plotly's Python-API
 
 #### Functionality I Have Added
 
-heartbeat() function - call this when want to keep the connection alive, but do not want to send data within the 60s window.
+heartbeat() - call this function when you want to keep the connection alive, but do not want to send data within the 60s window.
 
 #### Shareable, interactive, publication-quality plots in your web browser.
 
