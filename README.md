@@ -1,6 +1,10 @@
 Plotly's Python-API
 ===================
 
+#### Functionality I Have Added
+
+heartbeat() function - call this when want to keep the connection alive, but do not want to send data within the 60s window.
+
 #### Shareable, interactive, publication-quality plots in your web browser.
 
 [![Contour subplots in Python](http://i.imgur.com/9QKmUQb.png)](https://plot.ly/~test-runner/10)
