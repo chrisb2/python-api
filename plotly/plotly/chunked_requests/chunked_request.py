@@ -22,7 +22,7 @@ class Stream:
         the connection is still open before doing so.
         '''
         
-        _verifyConnection(reconnect_on)
+        self._verifyConnection(reconnect_on)
 
         try:
             msg = data
@@ -39,7 +39,7 @@ class Stream:
         open before doing so.
         '''
 
-        _verifyConnection(reconnect_on)
+        self._verifyConnection(reconnect_on)
 
         try:
             # Send the \n
